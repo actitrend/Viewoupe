@@ -1,0 +1,18 @@
+*{box-sizing:border-box}
+html{background:#eef1f4;color:#1d2430}
+body{margin:0;font:18px/1.78 Georgia,"Times New Roman",serif}
+a{color:#285ea8}
+.sitebar{font:14px/1.4 system-ui,-apple-system,"Segoe UI",Arial,sans-serif;background:#fff;border-bottom:1px solid #dbe1e8}
+.sitebar__inner{max-width:920px;margin:auto;padding:14px 26px;display:flex;gap:22px;align-items:center}
+.sitebar strong{margin-right:auto;color:#0f172a}.sitebar a{text-decoration:none;color:#526070}
+main{max-width:920px;margin:0 auto;background:#fff;min-height:100vh;padding:68px 72px 120px}
+article{max-width:690px;margin:0 auto}
+.eyebrow{font:700 12px/1.3 system-ui,-apple-system,"Segoe UI",Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#64748b}
+h1,h2{font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;color:#0f172a;line-height:1.12}
+h1{font-size:46px;letter-spacing:-.035em;margin:.3em 0 .35em}h2{font-size:28px;margin:2.1em 0 .65em}
+.dek{font-size:23px;line-height:1.55;color:#475569;margin-bottom:1.6em}.byline{font:14px/1.4 system-ui,-apple-system,"Segoe UI",Arial,sans-serif;color:#718096;border-bottom:1px solid #e2e8f0;padding-bottom:22px;margin-bottom:34px}
+p{margin:0 0 1.25em}blockquote{margin:2em 0;padding:4px 0 4px 24px;border-left:4px solid #94a3b8;font-size:22px;line-height:1.55;color:#334155}
+pre{margin:1.8em 0;padding:20px 22px;background:#101827;color:#e8eef8;border-radius:10px;overflow:auto;font:15px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace}code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+table{width:100%;border-collapse:collapse;margin:1.8em 0;font:15px/1.5 system-ui,-apple-system,"Segoe UI",Arial,sans-serif}th,td{text-align:left;padding:10px 12px;border-bottom:1px solid #dce3ea}th{color:#475569}
+ul,ol{margin:0 0 1.4em;padding-left:1.4em}li{margin:.45em 0}.footnotes{margin-top:3em;padding-top:18px;border-top:1px solid #e2e8f0;color:#64748b;font-size:15px}
+@media(max-width:760px){main{padding:44px 24px 90px}h1{font-size:37px}.sitebar__inner{padding:12px 18px;overflow:auto}.sitebar strong{white-space:nowrap}}
