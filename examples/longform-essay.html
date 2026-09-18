@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="../assets/brand/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="article-demo.css">
+  <title>Viewoupe — Long-form essay demo</title>
+</head>
+<body>
+<header class="sitebar"><div class="sitebar__inner"><strong>Viewoupe article demo</strong><a href="index.html">Examples</a><a href="technical-article.html">Technical</a><a href="research-note.html">Research</a></div></header>
+<main>
+<article>
+  <div class="eyebrow">Long-form essay · linear reading</div>
+  <h1>The web is easiest to read when the page gets out of the way</h1>
+  <p class="dek">A deliberately ordinary article with long paragraphs, few interruptions, and enough depth to make local enlargement useful.</p>
+  <div class="byline">Original demo text · approximately 7 minutes</div>
+  <p>Most reading on the web happens inside pages that were designed to do more than present prose. A single screen may contain navigation, account controls, promotional modules, sidebars, related links, comments, and several competing visual hierarchies. None of those elements is necessarily wrong, but together they create a mismatch between the structure of the page and the narrower task of reading one sentence at a time.</p>
+  <p>Browser zoom solves a different problem. It enlarges the entire interface, which is useful when every element is too small. But a reader may only need help with one paragraph, a quotation, a difficult definition, or a block of code. Enlarging the whole page can push navigation off screen, change line lengths dramatically, and force extra scrolling through elements that were already comfortable to use.</p>
+  <p>A local reading layer starts from another assumption: the current unit of attention matters more than the current unit of layout. Instead of asking the browser to scale the page, it temporarily gives one fragment a quieter, larger reading surface. The original page remains present as context, but it stops dictating the typography of the active passage.</p>
+  <h2>Reading is a sequence of temporary focus states</h2>
+  <p>Long articles are not consumed as a single visual object. Attention moves from paragraph to paragraph, sometimes pausing on a sentence and sometimes skipping ahead. A useful reading tool should therefore be reversible and lightweight. Opening a fragment should not feel like entering a separate application, and closing it should return the reader to exactly the same place.</p>
+  <p>This matters especially when text density changes within a page. A lead paragraph may be large and comfortable while the body is smaller. A footnote may be compact. A code sample may use a narrow monospace font. A quotation may be styled with low contrast. The reader's need is local even when the page's design system is global.</p>
+  <blockquote>A reading aid does not need to redesign the web. It only needs to make the current passage easier to inhabit for a moment.</blockquote>
+  <p>The distinction sounds small, but it changes the interaction. A local tool can preserve the user's place, avoid taking over the page, and let the reader choose when assistance is useful. The same paragraph can be opened, enlarged, copied, placed on a temporary shelf, or expanded into its surrounding article without requiring the publisher to rebuild the site.</p>
+  <h2>Why line length matters after enlargement</h2>
+  <p>Magnification is not only about making glyphs bigger. Comfortable reading also depends on reflow. If text is simply stretched, a long line may remain visually long and become awkward to scan. A proper reading surface gives the enlarged text a new measure, allowing lines to wrap naturally while preserving hierarchy such as emphasis, links, headings, and quotations.</p>
+  <p>This is one reason a small isolated layer can be more useful than a screenshot-like zoom. The content is still live text. It can rewrap, be selected, copied, and presented with a controlled line height. The reader gets a temporary typographic environment instead of a magnified image of the original layout.</p>
+  <p>There is also a psychological benefit to small scope. A tool that changes only the thing a person has chosen is easier to predict. It does not suddenly rearrange the rest of the page. The user can experiment with a larger size or stronger focus and immediately undo the change by closing the layer.</p>
+  <h2>Article mode is a different level of intent</h2>
+  <p>Sometimes the local fragment is only the entry point. After opening one paragraph, the reader may decide that the entire surrounding article deserves the same treatment. That is where an explicit Article action becomes useful. It should be available only when the tool can identify a coherent reading container with enough confidence.</p>
+  <p>The distinction between fragment and article is important. Automatic takeover would make the tool feel like a conventional reader mode. Explicit escalation keeps the interaction understandable: first open what is under attention, then broaden the scope if the larger context is useful.</p>
+  <p>On this page, try both behaviors. Open a paragraph with VL and increase the text size. Then use Article to bring the complete essay into the reading layer. The difference between the two modes is easier to feel on a continuous page like this than on a dashboard made from cards and short interface fragments.</p>
+  <h2>A small tool can still change the rhythm of reading</h2>
+  <p>Many accessibility and reading problems are broad and require careful design at the page level. A local reading layer does not replace that work. Its value is narrower: it gives the reader a user-controlled adaptation when the published typography is inconvenient at a particular moment.</p>
+  <p>That modest scope is also what makes the pattern portable. It can sit on a simple essay, a technical manual, a news feature, or an old site built from generic containers. The surrounding design may differ radically, while the act of reading a selected passage remains familiar.</p>
+  <div class="footnotes">Demo goal: hover several body paragraphs, compare local zoom with Article mode, try Focus, and verify that the navigation bar never receives a VL activator.</div>
+</article>
+</main>
+<script src="../dist/viewoupe.js" data-viewoupe></script>
+</body>
+</html>
