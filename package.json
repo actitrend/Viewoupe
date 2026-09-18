@@ -1,0 +1,42 @@
+{
+  "name": "viewoupe",
+  "version": "0.1.0",
+  "description": "A dependency-free in-place reading layer for the web. Zoom the text, not the page.",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/viewoupe.js",
+  "browser": "dist/viewoupe.js",
+  "unpkg": "dist/viewoupe.js",
+  "jsdelivr": "dist/viewoupe.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/actitrend/Viewoupe.git"
+  },
+  "homepage": "https://github.com/actitrend/Viewoupe#readme",
+  "bugs": {
+    "url": "https://github.com/actitrend/Viewoupe/issues"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node --check src/viewoupe.js && node --check dist/viewoupe.js",
+    "serve": "node server.mjs",
+    "prepublishOnly": "npm run build && npm run check"
+  },
+  "keywords": [
+    "reading",
+    "accessibility",
+    "browser",
+    "text",
+    "zoom",
+    "focus",
+    "shadow-dom",
+    "reader"
+  ]
+}

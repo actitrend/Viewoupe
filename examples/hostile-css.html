@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Viewoupe — hostile CSS test</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;background:#111;color:#ddd;font:17px/1.7 Arial,sans-serif}
+    main{width:min(1100px,94vw);margin:40px auto;padding:38px;background:#1c1c1c;border:7px solid #333}
+    h1,h2{font-family:Impact,Arial,sans-serif;letter-spacing:.03em;color:#fff}
+    p{padding:14px 18px;background:#242424;border:2px dashed #555}
+    button{font-size:40px!important;width:100%!important;background:red!important;color:yellow!important}
+    a{color:#4fe;text-transform:uppercase}
+    code{font-family:Consolas,monospace;background:#050505;color:#8f8;padding:.1em .35em}
+    pre{overflow:auto;padding:20px;background:#050505;border:3px solid #484;color:#8f8}
+    .wide{font-size:20px;max-width:none}
+  </style>
+</head>
+<body>
+<main>
+  <h1>«Чужой» сайт с конфликтующим CSS</h1>
+  <p class="wide">Эта страница специально оформлена агрессивно. Её CSS принудительно делает все обычные кнопки огромными и красными, меняет шрифты, фон и оформление ссылок. Интерфейс Viewoupe при этом должен остаться своим благодаря Shadow DOM.</p>
+  <p>Наведи курсор сюда: должен появиться только маленький VL. Нажми VL или Alt+L, увеличь текст и проверь, что панель управления не наследует красные кнопки этой страницы.</p>
+  <h2>Код на чужом сайте</h2>
+  <pre><code>function calculateReadingWidth(fontSize, viewportWidth) {
+  const idealCharacters = 68;
+  return Math.min(viewportWidth - 48, fontSize * idealCharacters * 0.55);
+}</code></pre>
+  <p>Здесь есть <strong>жирный текст</strong>, <em>курсив</em>, <code>inline code</code> и <a href="https://example.com">ссылка</a>. В Viewoupe семантика должна сохраниться, но агрессивные стили страницы — нет.</p>
+
+  <h2>Проверка Article mode</h2>
+  <p>После открытия любого этого абзаца нажми кнопку Article. Viewoupe должен осознанно показать содержимое элемента main целиком, а не делать это из-за случайного клика по пустому месту.</p>
+  <p>Этот режим появился из полезного побочного эффекта первой версии: иногда крупное представление всей статьи действительно удобнее локальной линзы, но теперь оно включается явно.</p>
+
+  <script src="../dist/viewoupe.js" data-viewoupe></script>
+</main>
+</body>
+</html>

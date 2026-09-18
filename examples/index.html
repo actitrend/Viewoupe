@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Viewoupe Prototype</title>
+  <style>
+    body{margin:0;background:#f4f1ea;color:#202020;font:18px/1.72 Georgia,serif}
+    main{max-width:820px;margin:0 auto;padding:64px 28px 120px;background:#fff;min-height:100vh;box-shadow:0 0 50px rgba(0,0,0,.06)}
+    h1,h2{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;line-height:1.15}
+    h1{font-size:44px;margin-top:0} h2{margin-top:48px}
+    .lead{font-size:22px;color:#444}
+    .note{padding:18px 20px;background:#f0f5ff;border-left:4px solid #6a8fd8}
+    code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#f3f3f3;padding:.12em .3em;border-radius:4px}
+    pre{padding:18px 20px;background:#17191d;color:#f5f7fa;border-radius:12px;overflow:auto;font:15px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace} pre code{background:none;padding:0;color:inherit}
+  </style>
+</head>
+<body>
+<main>
+  <h1>Viewoupe: тест локального чтения</h1>
+  <p class="lead">Наведи курсор на абзац: появится только маленький маркер VL. Клик по VL открывает линзу. Alt+L открывает текущий абзац с клавиатуры, Esc всегда возвращает обычную страницу.</p>
+  <p class="note"><strong>Проверь:</strong> VL по наведению, Alt+L, A− / A+, Focus, Article, Copy и выделение части текста — после выделения VL должен появиться рядом с ним.</p>
+
+  <h2>Почему локальная линза может быть удобнее общего масштаба</h2>
+  <p>Глобальное увеличение страницы помогает, когда весь интерфейс слишком мелкий, но оно одновременно увеличивает меню, изображения, боковые панели и другие элементы. Viewoupe решает более узкую задачу: временно сделать удобным именно тот фрагмент текста, который пользователь читает сейчас, не перестраивая всю страницу.</p>
+  <p>В длинных статьях внимание постоянно перемещается между абзацами. Если один фрагмент особенно сложный или плохо различимый, пользователь может открыть его крупно, изменить размер текста и затем одним нажатием клавиши Escape вернуться в исходный контекст.</p>
+
+  <h2>Текст со встроенной разметкой</h2>
+  <p>Этот абзац содержит <strong>жирное выделение</strong>, <em>курсив</em>, фрагмент <code>inline code</code> и <a href="https://example.com">обычную ссылку</a>. В линзе базовая смысловая разметка должна сохраниться, но стили исходного сайта не должны проникать внутрь интерфейса Viewoupe.</p>
+
+  <h2>Проверка длинного абзаца</h2>
+  <p>Хороший режим чтения должен не просто геометрически растягивать исходный текст, а выполнять настоящий reflow. При увеличении размера шрифта строка должна становиться короче, текст — переноситься естественно, а межстрочный интервал — оставаться комфортным. Именно поэтому прототип меняет типографику внутри отдельного изолированного слоя вместо применения CSS transform к исходному элементу страницы.</p>
+
+  <blockquote>Цель прототипа — проверить сам паттерн взаимодействия: абзац становится временным интерфейсным объектом, с которым можно работать прямо во время чтения.</blockquote>
+
+  <h2>Ещё несколько абзацев для прокрутки</h2>
+  <p>Viewoupe не должен заставлять пользователя переходить в отдельный Reader Mode. Контекст страницы сохраняется, а линза появляется только тогда, когда она нужна. После закрытия пользователь остаётся на той же позиции страницы.</p>
+  <p>В следующей версии можно добавить регулировку ширины строки, межстрочного интервала, контрастности, временную подсветку выбранных слов и режим быстрого просмотра по удержанию клавиши.</p>
+
+  <h2>Код: JavaScript</h2>
+  <p>Проверь наведение и увеличение на блоке кода. Панель Viewoupe должна оставаться на месте, а длинные строки — читаться внутри линзы.</p>
+  <pre><code>function findReadableBlock(node) {
+  const candidate = node.closest('p, li, blockquote, pre');
+  if (!candidate) return null;
+  const text = candidate.textContent.trim();
+  return text.length >= 24 ? candidate : null;
+}</code></pre>
+
+  <h2>Код: 1С / BSL</h2>
+  <pre><code>Функция ПолучитьСуммуДокумента(Документ) Экспорт
+    Если Документ = Неопределено Тогда
+        Возврат 0;
+    КонецЕсли;
+
+    Возврат Документ.СуммаДокумента;
+КонецФункции</code></pre>
+
+  <h2>Код: JSON и длинная строка</h2>
+  <pre><code>{
+  "feature": "Viewoupe",
+  "mode": "in-place reading microeditor",
+  "zoomLevels": [1, 1.2, 1.4, 1.7, 2],
+  "veryLongValue": "Эта строка специально сделана длинной, чтобы проверить переносы, горизонтальное поведение и удобство чтения кода при сильном локальном увеличении текста."
+}</code></pre>
+
+  <script src="../dist/viewoupe.js" data-viewoupe></script>
+</main>
+</body>
+</html>
