@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="../assets/brand/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="article-demo.css">
+  <title>Viewoupe — Research note demo</title>
+</head>
+<body>
+<header class="sitebar"><div class="sitebar__inner"><strong>Viewoupe article demo</strong><a href="index.html">Examples</a><a href="longform-essay.html">Essay</a><a href="technical-article.html">Technical</a></div></header>
+<main>
+<article>
+  <div class="eyebrow">Research note · dense reading</div>
+  <h1>What makes a reading aid feel trustworthy?</h1>
+  <p class="dek">A compact research-style note on predictability, control, and the cost of accidental interface behavior.</p>
+  <div class="byline">Original demo text · structured argument with notes</div>
+  <p>Reading assistance is often evaluated by what it can change: font size, contrast, spacing, width, highlighting, or page structure. Those capabilities matter, but the experience is also shaped by something less visible: whether the reader can predict when the tool will appear, what it will affect, and how to return to the original page.</p>
+  <p>Predictability becomes especially important for tools that sit on top of arbitrary websites. The host page already has its own controls and hover behavior. A reading layer that appears over navigation, disappears while the pointer is moving toward it, or offers actions that sometimes do nothing adds a second source of uncertainty. The resulting friction is small in each moment but accumulates quickly during sustained reading.</p>
+  <h2>Observation 1: scope should follow explicit intent</h2>
+  <p>A reader pointing at one paragraph is expressing a local intention. Opening only that block matches the action closely. Expanding to a larger article can still be valuable, but it represents a second decision and should therefore be explicit. This separation also makes failure easier to reason about: local reading can remain available even on pages where no reliable article container can be found.</p>
+  <blockquote>Trust increases when the visible control describes an action the interface can actually complete.</blockquote>
+  <p>This suggests a simple rule for interface design: avoid presenting controls whose availability depends on hidden conditions that the user cannot inspect. If an Article action requires a coherent article root, the button should be shown only after such a root has been identified.</p>
+  <h2>Observation 2: transient controls need generous timing</h2>
+  <p>A hover activator creates a small motor task. The reader notices the marker, moves the pointer away from the text, and aims at a compact target. If the activator disappears as soon as the pointer leaves the exact text node, the interaction becomes a chase. A short appearance delay can reduce visual noise, but the departure behavior should be more forgiving than the arrival behavior.</p>
+  <p>The asymmetry is deliberate. Appearing too quickly makes the page noisy; disappearing too quickly makes the control hard to use. A reading aid should be quiet when ignored and stable once noticed.</p>
+  <h2>Observation 3: visual isolation is part of functional reliability</h2>
+  <p>When a component is injected into unknown pages, styling is not merely cosmetic. Host styles can enlarge buttons, recolor links, alter box sizing, or change fonts in ways that break the control surface. Encapsulation therefore supports both visual consistency and interaction reliability.</p>
+  <p>At the same time, the copied reading content should preserve useful semantics. Headings should still look like headings, emphasis should remain visible, links should remain links, and code should remain code. The goal is not to reproduce the publisher's design but to carry over the structure that helps the reader understand the passage.</p>
+  <h2>Practical implications</h2>
+  <ol>
+    <li>Prefer local scope first; expand only on explicit request.</li>
+    <li>Do not show Article when no plausible article context exists.</li>
+    <li>Exclude navigation and toolbar regions from hover activation.</li>
+    <li>Give the pointer enough time to reach a transient activator.</li>
+    <li>Keep the reading surface stylistically isolated from the host page.</li>
+  </ol>
+  <p>These rules are intentionally conservative. They trade a small amount of feature availability for a larger gain in predictability. On a complex site, not every block has to become readable through every mode. It is more important that the actions which do appear behave consistently.</p>
+  <p>That trade-off is easy to miss when testing only on purpose-built demo pages. Real sites contain advertising, nested navigation, interactive cards, sticky bars, and long chains of generic containers. A useful test suite should therefore include both clean article pages and hostile layouts so that improvements to one class of page do not silently degrade another.</p>
+  <h2>Notes</h2>
+  <ul>
+    <li>This page uses a semantic <code>&lt;article&gt;</code> so Article mode has an unambiguous root.</li>
+    <li>The top bar is intentionally separate navigation and should never receive VL.</li>
+    <li>The prose is long enough to test repeated hover, zoom, Focus, Copy and Shelf interactions.</li>
+  </ul>
+  <div class="footnotes">Demo goal: read several consecutive paragraphs with local zoom, save two passages to Shelf, then open the whole note with Article and compare the experience.</div>
+</article>
+</main>
+<script src="../dist/viewoupe.js" data-viewoupe></script>
+</body>
+</html>
