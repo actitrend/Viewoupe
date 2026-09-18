@@ -84,7 +84,6 @@
       .shelf-text { white-space:pre-wrap; overflow-wrap:anywhere; max-height:5.4em; overflow:hidden; font:500 13px/1.45 system-ui,-apple-system,Segoe UI,Arial,sans-serif; }
       .shelf-meta { margin-top:6px; opacity:.52; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font:500 11px system-ui,-apple-system,Segoe UI,Arial,sans-serif; }
       .shelf-remove { position:absolute; right:7px; top:7px; min-width:27px; padding:4px 7px; }
-    
     `;
     state.shadow.append(style);
 
@@ -205,8 +204,13 @@
     return { text, range };
   }
 
+  function isExcludedReadingContext(start) {
+    if (!(start instanceof Element)) return true;
+    return !!start.closest('nav, header, footer, [role="navigation"], [role="banner"], [role="contentinfo"], [role="menu"], [role="menubar"], [role="toolbar"]');
+  }
+
   function findTarget(start) {
-    if (!(start instanceof Element)) return null;
+    if (!(start instanceof Element) || isExcludedReadingContext(start)) return null;
     const direct = start.closest(state.config.selector);
     if (direct && direct.textContent.trim().length >= state.config.minTextLength) return direct;
     let el = start;
@@ -361,7 +365,6 @@
     }
   }
 
-
   function shelfText() {
     return (state.lastSelectionText || state.target?.textContent?.trim() || state.content?.textContent?.trim() || '').trim();
   }
@@ -494,6 +497,7 @@
     if (!state.enabled || state.lens?.style.display === 'block') return;
     const relatedPath = event.relatedTarget ? [event.relatedTarget] : [];
     if (event.relatedTarget === state.host || relatedPath.includes(state.activator) || state.activator?.contains?.(event.relatedTarget)) return;
+    if (event.relatedTarget && state.hoverTarget?.contains?.(event.relatedTarget)) return;
     clearTimeout(state.leaveTimer);
     state.leaveTimer = setTimeout(() => {
       if (state.lens?.style.display !== 'block') hideActivator();
