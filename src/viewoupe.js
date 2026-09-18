@@ -20,6 +20,7 @@
     lens: null,
     content: null,
     toolbar: null,
+    articleButton: null,
     backdrop: null,
     activator: null,
     shelfPanel: null,
@@ -58,6 +59,7 @@
       .toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:6px; align-items:center; padding:8px 10px; background:rgba(250,250,250,.96); border-bottom:1px solid rgba(0,0,0,.08); backdrop-filter:blur(10px); }
       button { appearance:none; border:1px solid rgba(0,0,0,.12); background:#fff; color:#222; border-radius:9px; padding:6px 10px; font:600 13px system-ui,-apple-system,Segoe UI,Arial,sans-serif; cursor:pointer; }
       button:hover { background:#f0f2f5; }
+      [hidden] { display:none !important; }
       [data-act="close"] { color:#b42318; border-color:rgba(180,35,24,.22); font-weight:800; }
       [data-act="close"]:hover { background:#fff0ef; color:#8f1d14; border-color:rgba(180,35,24,.38); }
       .spacer { flex:1; }
@@ -147,6 +149,7 @@
     `;
     state.content = lens.querySelector('.content');
     state.toolbar = lens.querySelector('.toolbar');
+    state.articleButton = lens.querySelector('[data-act="article"]');
     state.shelfPanel = lens.querySelector('.shelf-panel');
     state.shelfList = lens.querySelector('.shelf-list');
     state.shadow.append(lens);
@@ -219,11 +222,32 @@
     return null;
   }
 
+  function isReadableContainer(el) {
+    if (!(el instanceof Element)) return false;
+    if (['NAV','HEADER','FOOTER','ASIDE','FORM'].includes(el.tagName)) return false;
+    const text = (el.innerText || el.textContent || '').trim();
+    if (text.length < 280) return false;
+    const blocks = el.querySelectorAll(state.config.selector).length;
+    if (blocks < 2) return false;
+    const linkText = [...el.querySelectorAll('a')].reduce((n, a) => n + (a.innerText || a.textContent || '').trim().length, 0);
+    if (linkText / Math.max(text.length, 1) > 0.55) return false;
+    const r = el.getBoundingClientRect();
+    return r.width >= 240 && r.height >= 120;
+  }
+
   function findArticleRoot() {
     const base = state.target;
-    const nearest = base?.closest?.('article, main, [role="main"]');
-    if (nearest) return nearest;
-    return document.querySelector('article, main, [role="main"]');
+    const semantic = base?.closest?.('article, main, [role="main"]');
+    if (semantic && (semantic.innerText || semantic.textContent || '').trim().length >= state.config.minTextLength) return semantic;
+    for (let el = base?.parentElement, depth = 0; el && el !== document.body && depth < 8; el = el.parentElement, depth++) {
+      if (isReadableContainer(el)) return el;
+    }
+    return null;
+  }
+
+  function updateArticleAction() {
+    if (!state.articleButton) return;
+    state.articleButton.hidden = !findArticleRoot();
   }
 
   function selectionElement(sel) {
@@ -277,6 +301,7 @@
     if (sel && selectionMatches) renderFromSelection(sel);
     else if (target) renderFromElement(target);
     else return;
+    updateArticleAction();
 
     state.locked = lock;
     state.lens.style.display = 'block';
@@ -335,6 +360,7 @@
       state.backdrop.style.pointerEvents = 'auto';
     }
   }
+
 
   function shelfText() {
     return (state.lastSelectionText || state.target?.textContent?.trim() || state.content?.textContent?.trim() || '').trim();
