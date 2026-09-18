@@ -32,53 +32,57 @@
         <a class="keep" href="https://github.com/actitrend/Viewoupe">GitHub ↗</a>
       </div>
     </nav>
-    <div class="hero">
-      <div>
-        <div class="eyebrow">In-place reading tools for the web</div>
-        <h1>Zoom the text,<br>not the page.</h1>
-        <p class="lead">Viewoupe enlarges, focuses, copies, and collects the text you are reading without zooming the whole interface or leaving the page.</p>
-        <div class="actions"><a class="btn primary" href="#try">Try Viewoupe</a><a class="btn" href="https://github.com/actitrend/Viewoupe">View source</a></div>
-      </div>
-      <div class="demo-card">
-        <span class="vl-demo">VL</span>
-        <p>Move the pointer over this paragraph. The real Viewoupe trigger will appear beside it. Open it, press A+, try Focus, then close with Esc.</p>
-        <p>This demo uses exactly the same <strong>dist/viewoupe.js</strong> file published in the repository.</p>
-        <div class="hint">Tip: select a sentence first to open only that selection.</div>
-      </div>
-    </div>
   </div>
-  <section id="how">
+  <main id="main-content">
     <div class="wrap">
-      <h2 class="section-title">Same page. Closer reading.</h2>
-      <p class="section-copy">Viewoupe treats the current paragraph, selection, code block, or article as the unit of interaction. The source page stays untouched.</p>
-      <div class="grid">
-        <div class="card"><b>Local enlargement</b><p>Real font-size changes and reflow instead of scaling the whole page.</p></div>
-        <div class="card"><b>Focus modes</b><p>Normal, dim, and isolate modes reduce surrounding visual noise.</p></div>
-        <div class="card"><b>Temporary Shelf</b><p>Collect several snippets and copy them together when you are ready.</p></div>
+      <div class="hero">
+        <div>
+          <div class="eyebrow">In-place reading tools for the web</div>
+          <h1>Zoom the text,<br>not the page.</h1>
+          <p class="lead">Viewoupe enlarges, focuses, copies, and collects the text you are reading without zooming the whole interface or leaving the page.</p>
+          <div class="actions"><a class="btn primary" href="#try">Try Viewoupe</a><a class="btn" href="https://github.com/actitrend/Viewoupe">View source</a></div>
+        </div>
+        <div class="demo-card">
+          <span class="vl-demo">VL</span>
+          <p>Move the pointer over this paragraph. The real Viewoupe trigger will appear beside it. Open it, press A+, try Focus, then close with Esc.</p>
+          <p>This demo uses exactly the same <strong>dist/viewoupe.js</strong> file published in the repository.</p>
+          <div class="hint">Tip: select a sentence first to open only that selection.</div>
+        </div>
       </div>
     </div>
-  </section>
-  <section id="try">
-    <div class="wrap">
-      <h2 class="section-title">Try it here</h2>
-      <p class="section-copy">Hover any paragraph below. A small <strong>VL</strong> trigger appears. Nothing opens until you choose it.</p>
-      <div class="grid">
-        <div class="card"><b>Reading</b><p>Browser zoom is useful when an entire interface is too small. Viewoupe is for the other case: when you want to make only the text you are reading easier to see.</p></div>
-        <div class="card"><b>Selection</b><p>Select just this sentence, then use VL. Viewoupe will open the selected fragment rather than the complete paragraph.</p></div>
-        <div class="card"><b>Code</b><p>Viewoupe also works with preformatted content, documentation, tables, headings, and other readable blocks.</p></div>
+    <section id="how">
+      <div class="wrap">
+        <h2 class="section-title">Same page. Closer reading.</h2>
+        <p class="section-copy">Viewoupe treats the current paragraph, selection, code block, or article as the unit of interaction. The source page stays untouched.</p>
+        <div class="grid">
+          <div class="card"><b>Local enlargement</b><p>Real font-size changes and reflow instead of scaling the whole page.</p></div>
+          <div class="card"><b>Focus modes</b><p>Normal, dim, and isolate modes reduce surrounding visual noise.</p></div>
+          <div class="card"><b>Temporary Shelf</b><p>Collect several snippets and copy them together when you are ready.</p></div>
+        </div>
       </div>
-      <pre class="code"><code>&lt;script src="dist/viewoupe.js" data-viewoupe&gt;&lt;/script&gt;
+    </section>
+    <section id="try">
+      <div class="wrap">
+        <h2 class="section-title">Try it here</h2>
+        <p class="section-copy">Hover any paragraph below. A small <strong>VL</strong> trigger appears. Nothing opens until you choose it.</p>
+        <div class="grid">
+          <div class="card"><b>Reading</b><p>Browser zoom is useful when an entire interface is too small. Viewoupe is for the other case: when you want to make only the text you are reading easier to see.</p></div>
+          <div class="card"><b>Selection</b><p>Select just this sentence, then use VL. Viewoupe will open the selected fragment rather than the complete paragraph.</p></div>
+          <div class="card"><b>Code</b><p>Viewoupe also works with preformatted content, documentation, tables, headings, and other readable blocks.</p></div>
+        </div>
+        <pre class="code"><code>&lt;script src="dist/viewoupe.js" data-viewoupe&gt;&lt;/script&gt;
 
 // or
 Viewoupe.init();</code></pre>
-    </div>
-  </section>
-  <section>
-    <div class="wrap">
-      <h2 class="section-title">Small core. No account.</h2>
-      <p class="section-copy">Version 0.1.0 is dependency-free, has no analytics, sends no page text to a server, and keeps Shelf contents only in memory until reload.</p>
-    </div>
-  </section>
+      </div>
+    </section>
+    <section>
+      <div class="wrap">
+        <h2 class="section-title">Small core. No account.</h2>
+        <p class="section-copy">Version 0.1.0 is dependency-free, has no analytics, sends no page text to a server, and keeps Shelf contents only in memory until reload.</p>
+      </div>
+    </section>
+  </main>
   <div class="wrap">
     <footer><span>Viewoupe 0.1.0 · MIT</span><span>Zoom the text, not the page.</span></footer>
   </div>
