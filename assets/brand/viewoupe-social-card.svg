@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" role="img" aria-labelledby="title desc">
+  <title id="title">Viewoupe — Zoom the text, not the page.</title>
+  <desc id="desc">Social preview card for the Viewoupe open-source reading layer.</desc>
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#EEF4FB"/></linearGradient></defs>
+  <rect width="1280" height="640" rx="40" fill="url(#bg)"/>
+  <circle cx="1080" cy="85" r="220" fill="#3B82F6" opacity=".055"/>
+  <g transform="translate(146 165)">
+    <text x="0" y="142" fill="#0F172A" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="160" font-weight="700" letter-spacing="-8">view</text>
+    <line x1="418" y1="10" x2="418" y2="155" stroke="#3B82F6" stroke-width="5" stroke-linecap="round"/>
+    <text x="448" y="142" fill="#64748B" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="160" font-weight="500" letter-spacing="-8">oupe</text>
+    <line x1="782" y1="123" x2="821" y2="162" stroke="#3B82F6" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <text x="640" y="430" text-anchor="middle" fill="#334155" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="48" font-weight="500" letter-spacing="1">Zoom the text, not the page.</text>
+  <text x="640" y="492" text-anchor="middle" fill="#64748B" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="26" font-weight="400" letter-spacing="2">IN-PLACE READING TOOLS FOR THE WEB</text>
+  <text x="84" y="578" fill="#64748B" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20" font-weight="600" letter-spacing="4">VIEWOUPE · OPEN SOURCE</text>
+</svg>

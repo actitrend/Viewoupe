@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Viewoupe app icon</title>
+  <desc id="desc">Compact v-o mark with blue separator and magnifier handle.</desc>
+  <rect x="24" y="24" width="464" height="464" rx="112" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="4"/>
+  <text x="95" y="318" fill="#0F172A" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="220" font-weight="700" letter-spacing="-10">v</text>
+  <line x1="249" y1="151" x2="249" y2="335" stroke="#3B82F6" stroke-width="8" stroke-linecap="round"/>
+  <text x="270" y="318" fill="#64748B" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="220" font-weight="500" letter-spacing="-10">o</text>
+  <line x1="389" y1="313" x2="428" y2="352" stroke="#3B82F6" stroke-width="10" stroke-linecap="round"/>
+</svg>

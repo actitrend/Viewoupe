@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" role="img" aria-labelledby="title desc">
+  <title id="title">Viewoupe dark logo</title>
+  <desc id="desc">Dark-mode Viewoupe wordmark.</desc>
+  <rect width="1200" height="300" fill="#0F172A"/>
+  <g transform="translate(86 54)">
+    <text x="0" y="128" fill="#F8FAFC" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="148" font-weight="700" letter-spacing="-7">view</text>
+    <line x1="384" y1="4" x2="384" y2="142" stroke="#3B82F6" stroke-width="4" stroke-linecap="round"/>
+    <text x="410" y="128" fill="#B8C6D9" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="148" font-weight="500" letter-spacing="-7">oupe</text>
+    <line x1="730" y1="112" x2="765" y2="147" stroke="#3B82F6" stroke-width="5" stroke-linecap="round"/>
+  </g>
+</svg>
