@@ -1,30 +1,34 @@
-# Viewoupe brand notes
-
-## Name
+# Viewoupe brand
 
 Official product and project name: **Viewoupe**.
 
 The name comes from **View + Loupe**. Suggested pronunciation: **VIEW-oop**.
 
-For filenames, package names, metadata, store listings, repository titles, and prose, always use `Viewoupe`.
+## Final mark
 
-## Stylized wordmark
+The primary visual form is `view|oupe`, but the separator is a thin graphic stroke rather than a literal pipe character. The final **e** is treated as the lens: a short blue diagonal stroke leaves its lower-right edge and becomes the magnifier handle.
 
-The visual wordmark may be written as:
+The mark must read as **Viewoupe first** and reveal the loupe idea second.
 
-`view|oupe`
+## Wordmark rules
 
-The vertical stroke is part of the logo treatment and hints at the missing `L` in `ViewLoupe`. Keep it tight with no spaces: use `view|oupe`, not `view | oupe`.
+- `view` — Charcoal `#0F172A`, heavier weight.
+- `oupe` — Slate `#64748B`, slightly lighter weight.
+- separator — Accent Blue `#3B82F6`, thin and unobtrusive.
+- magnifier handle — Accent Blue `#3B82F6`, short and light.
+- Do not add a full circle, rectangle, glow, or frame around `oupe`.
+- Do not enlarge the final `e` in the primary version.
+- Do not make the separator heavy enough to split the word visually.
 
-The wordmark styling is optional. Plain `Viewoupe` must always remain a valid fallback.
+## Plain form
 
-## Compact trigger
+For filenames, package names, repository metadata, store listings, URLs, and ordinary prose, always use **Viewoupe** without a separator.
 
-The in-page activator is **VL**.
+## Compact marks
 
-`VL` is intentionally short because it appears next to text during reading. It should remain visually distinct from page content but should not pulse continuously or demand attention.
+The in-page activator remains **VL** because it is functional UI rather than the brand wordmark.
 
-Current visual language: light neutral/blue pill, subtle cool glow, stronger glow on hover.
+The app/favicon mark may use the compact `v|o` construction, with the `o` acting as the lens and the same short blue handle.
 
 ## Primary message
 
@@ -33,3 +37,20 @@ Current visual language: light neutral/blue pill, subtle cool glow, stronger glo
 Supporting description:
 
 **In-place reading tools for the web.**
+
+## Palette
+
+- Charcoal — `#0F172A`
+- Slate — `#64748B`
+- Accent Blue — `#3B82F6`
+- Background — `#F8FAFC`
+- Surface — `#FFFFFF`
+- Border — `#E2E8F0`
+
+## Typography
+
+Primary UI and brand support typeface: **Inter**, with system sans-serif fallbacks for implementation.
+
+## Assets
+
+Production assets are stored in `assets/brand/`.
