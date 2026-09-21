@@ -18,7 +18,8 @@ Browser zoom changes the whole page. Reader modes move content into a separate e
 
 - Local font enlargement with real text reflow, not `transform: scale()`.
 - Passive `VL` trigger: no large overlay appears just because the pointer crossed text.
-- `Focus` modes: normal, dim, isolate.
+- `Focus` cycle: Focus → Deep → Anchors, with auto-dim on open.
+- Three reader-selected anchors that reduce a passage to its semantic skeleton.
 - Selection support for working with only part of a paragraph.
 - Explicit `Article` mode for a larger reading context.
 - `Copy` for the current reading object.
@@ -59,7 +60,10 @@ The global API is `window.Viewoupe`.
 - Click `VL` → open and lock the reading layer.
 - `Alt+L` → toggle the hovered block or current selection.
 - `A−` / `A+` → change local reading size.
-- `Focus` → cycle normal → dim → isolate.
+- `Focus` → cycle Focus → Deep → Anchors → Focus; Anchors is skipped until at least one anchor exists.
+- Select up to 5 words in the reading layer → save them into one of three anchor slots.
+- Hover an anchor slot → emphasize its phrase; click a slot → locate it in the text.
+- In Anchors mode, click an anchor phrase → temporarily reveal its surrounding text block.
 - `Article` → explicitly open the nearest article/main container.
 - `Copy` → copy the current block, selection, or article.
 - `+ Shelf` → save the current text clip in temporary in-memory Shelf.
@@ -68,6 +72,7 @@ The global API is `window.Viewoupe`.
 
 Shelf data is session-only and disappears on page reload. It is intentionally separate from the system clipboard.
 
+Anchors survive close/reopen for the same reading target during the current page session, but are not persisted across reloads.
 ## Design principles
 
 Viewoupe does not rewrite the source document. It clones only the chosen reading target into a Shadow DOM overlay, strips active or page-specific attributes, and preserves useful text semantics such as links and code.
@@ -76,7 +81,7 @@ The source page remains where it was. Closing Viewoupe returns the reader to the
 
 ## Privacy
 
-Viewoupe 0.1.0 does not send text to a server, does not require sign-in, does not use analytics, and does not persist Shelf contents. A future integration that adds remote services should make that behavior explicit and opt-in.
+Viewoupe 0.2.0 does not send text to a server, does not require sign-in, does not use analytics, and does not persist Shelf contents. A future integration that adds remote services should make that behavior explicit and opt-in.
 
 ## Project structure
 
@@ -106,4 +111,4 @@ MIT. See `LICENSE`.
 
 ## Status
 
-`0.1.0` is the first public-ready baseline. The intended next step is broad cross-site testing before adding AI, persistent storage, or extension-specific complexity.
+`0.2.0` adds the three-anchor focus and recall layer while remaining local, dependency-free, and non-persistent across page reloads. The intended next step is broad cross-site testing before adding AI or remote persistence.

@@ -1,6 +1,6 @@
 {
   "name": "viewoupe",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A dependency-free in-place reading layer for the web. Zoom the text, not the page.",
   "license": "MIT",
   "type": "module",

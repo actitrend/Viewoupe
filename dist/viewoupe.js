@@ -1,4 +1,4 @@
-/*! Viewoupe 0.1.0 | MIT License | Zoom the text, not the page. */
+/*! Viewoupe 0.2.0 | MIT License | Zoom the text, not the page. */
 (() => {
   'use strict';
 
@@ -30,6 +30,10 @@
     anchors: [],
     anchorStrip: null,
     anchorFlashLayer: null,
+    anchorMemory: new Map(),
+    anchorKey: null,
+    anchorContextTimer: null,
+    anchorReturnTimer: null,
     target: null,
     hoverTarget: null,
     locked: false,
@@ -90,9 +94,18 @@
       .shelf-remove { position:absolute; right:7px; top:7px; min-width:27px; padding:4px 7px; }
       .anchor-strip { display:flex; gap:8px; align-items:center; padding:8px 14px; background:#f7f9fc; border-bottom:1px solid rgba(0,0,0,.08); }
       .anchor-slot { flex:1; min-width:0; padding:7px 10px; border:1px dashed rgba(73,96,128,.28); border-radius:999px; color:#6b7480; background:#fff; font:600 12px system-ui,-apple-system,Segoe UI,Arial,sans-serif; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center; }
-      .anchor-slot.has-anchor { border-style:solid; border-color:rgba(64,116,214,.34); color:#20385f; background:linear-gradient(180deg,#fff 0%,#eef4ff 100%); box-shadow:0 0 0 1px rgba(76,124,214,.04),0 4px 14px rgba(45,83,150,.08); }
+      .anchor-slot.has-anchor { border-style:solid; border-color:rgba(64,116,214,.34); color:#20385f; background:linear-gradient(180deg,#fff 0%,#eef4ff 100%); box-shadow:0 0 0 1px rgba(76,124,214,.04),0 4px 14px rgba(45,83,150,.08); cursor:pointer; }
+      .anchor-slot.is-peeking { border-color:rgba(210,161,0,.52); box-shadow:0 0 0 2px rgba(241,196,15,.10),0 0 18px rgba(255,209,45,.16); }
       .anchor-mark { border-radius:.28em; padding:0 .08em; background:linear-gradient(180deg,rgba(255,244,171,.42),rgba(255,225,98,.62)); box-shadow:inset 0 -0.08em 0 rgba(210,161,0,.18); cursor:pointer; transition:box-shadow .16s ease,background .16s ease; }
-      .anchor-mark:hover { background:linear-gradient(180deg,rgba(255,244,171,.58),rgba(255,220,70,.78)); box-shadow:0 0 0 2px rgba(241,196,15,.12),0 0 16px rgba(255,209,45,.18); }
+      .anchor-mark:hover, .anchor-mark.is-peeking { background:linear-gradient(180deg,rgba(255,244,171,.58),rgba(255,220,70,.78)); box-shadow:0 0 0 2px rgba(241,196,15,.12),0 0 16px rgba(255,209,45,.26); }
+      .anchor-mark.is-pulsing { animation:viewoupeAnchorPulse .85s ease-out; }
+      @keyframes viewoupeAnchorPulse { 0% { box-shadow:0 0 0 0 rgba(255,209,45,.46),0 0 12px rgba(255,209,45,.24); } 55% { box-shadow:0 0 0 7px rgba(255,209,45,.10),0 0 28px rgba(255,209,45,.34); } 100% { box-shadow:inset 0 -0.08em 0 rgba(210,161,0,.18); } }
+      .content.anchor-only, .content.anchor-return { color:transparent; }
+      .content.anchor-only *, .content.anchor-return * { color:transparent !important; background-color:transparent !important; border-color:transparent !important; box-shadow:none !important; text-decoration-color:transparent !important; }
+      .content.anchor-only img, .content.anchor-only picture, .content.anchor-only video, .content.anchor-only canvas, .content.anchor-only svg, .content.anchor-return img, .content.anchor-return picture, .content.anchor-return video, .content.anchor-return canvas, .content.anchor-return svg { visibility:hidden !important; }
+      .content.anchor-only .anchor-mark, .content.anchor-only .anchor-mark *, .content.anchor-return .anchor-mark, .content.anchor-return .anchor-mark * { color:#19263a !important; visibility:visible !important; background:rgba(255,225,98,.82) !important; box-shadow:0 0 20px rgba(255,215,64,.58),0 0 42px rgba(255,215,64,.24) !important; }
+      .content.anchor-only .anchor-context-reveal, .content.anchor-only .anchor-context-reveal *, .content.anchor-return .anchor-neighborhood, .content.anchor-return .anchor-neighborhood * { color:#15171a !important; visibility:visible !important; }
+      .content.anchor-only .anchor-context-reveal .anchor-mark, .content.anchor-return .anchor-neighborhood .anchor-mark { color:#19263a !important; background:rgba(255,225,98,.82) !important; box-shadow:0 0 20px rgba(255,215,64,.58),0 0 42px rgba(255,215,64,.24) !important; }
       .anchor-flash-layer { position:fixed; inset:0; pointer-events:none; z-index:8; }
       .anchor-ghost { position:fixed; margin:0; padding:0 .08em; color:#19263a; background:rgba(255,225,98,.78); border-radius:.28em; box-shadow:0 0 18px rgba(255,215,64,.76),0 0 42px rgba(255,215,64,.34); opacity:1; transform:scale(1); transform-origin:left center; animation:viewoupeAnchorFade 3.2s ease-out forwards; }
       @keyframes viewoupeAnchorFade { 0% { opacity:1; filter:brightness(1.08); } 32% { opacity:1; filter:brightness(1.12); box-shadow:0 0 26px rgba(255,215,64,.92),0 0 62px rgba(255,215,64,.44); } 55% { opacity:.92; } 100% { opacity:0; filter:brightness(1); transform:scale(1.012); } }
@@ -189,7 +202,21 @@
     state.content.addEventListener('mouseup', () => setTimeout(addAnchorFromSelection, 0));
     state.content.addEventListener('click', (event) => {
       const mark = event.target.closest('.anchor-mark');
-      if (mark) removeAnchor(mark.dataset.anchorId);
+      if (!mark) return;
+      if (state.focusMode === 3) revealAnchorContext(mark.dataset.anchorId);
+      else removeAnchor(mark.dataset.anchorId);
+    });
+    state.anchorStrip.addEventListener('pointerover', (event) => {
+      const slot = event.target.closest('.anchor-slot.has-anchor');
+      if (slot) setAnchorPeek(Number(slot.dataset.anchorSlot), true);
+    });
+    state.anchorStrip.addEventListener('pointerout', (event) => {
+      const slot = event.target.closest('.anchor-slot.has-anchor');
+      if (slot) setAnchorPeek(Number(slot.dataset.anchorSlot), false);
+    });
+    state.anchorStrip.addEventListener('click', (event) => {
+      const slot = event.target.closest('.anchor-slot.has-anchor');
+      if (slot) jumpToAnchor(Number(slot.dataset.anchorSlot));
     });
 
     lens.addEventListener('click', (event) => {
@@ -216,13 +243,77 @@
     slots.forEach((slot, index) => {
       const anchor = state.anchors[index];
       slot.textContent = anchor ? anchor.text : `Anchor ${index + 1}`;
-      slot.title = anchor?.text || 'Select up to 5 words in the focused text';
+      slot.title = anchor ? `${anchor.text} · click to locate` : 'Select up to 5 words in the focused text';
       slot.classList.toggle('has-anchor', !!anchor);
+      if (!anchor) slot.classList.remove('is-peeking');
     });
+    updateFocusButton();
   }
 
   function resetAnchors() {
     state.anchors = [];
+    renderAnchors();
+  }
+
+  function normalizeAnchorText(text) {
+    return String(text || '').trim().replace(/\s+/g, ' ');
+  }
+
+  function boundaryTextOffset(root, container, offset) {
+    const r = document.createRange();
+    r.selectNodeContents(root);
+    r.setEnd(container, offset);
+    return r.toString().length;
+  }
+
+  function rangeFromOffsets(root, start, end) {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    let pos = 0, startNode = null, endNode = null, startOffset = 0, endOffset = 0;
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      const len = node.nodeValue?.length || 0;
+      if (!startNode && start >= pos && start <= pos + len) { startNode = node; startOffset = start - pos; }
+      if (!endNode && end >= pos && end <= pos + len) { endNode = node; endOffset = end - pos; }
+      pos += len;
+      if (startNode && endNode) break;
+    }
+    if (!startNode || !endNode) return null;
+    const r = document.createRange();
+    r.setStart(startNode, startOffset);
+    r.setEnd(endNode, endOffset);
+    return r;
+  }
+
+  function wrapAnchorRange(range, id) {
+    const mark = document.createElement('span');
+    mark.className = 'anchor-mark';
+    mark.dataset.anchorId = id;
+    mark.append(range.extractContents());
+    range.insertNode(mark);
+    return mark;
+  }
+
+  function persistAnchors() {
+    if (state.anchorKey == null) return;
+    state.anchorMemory.set(state.anchorKey, state.anchors.map(anchor => ({
+      id: anchor.id,
+      text: anchor.text,
+      start: anchor.start,
+      end: anchor.end,
+    })));
+  }
+
+  function restoreAnchors() {
+    const saved = state.anchorKey == null ? [] : (state.anchorMemory.get(state.anchorKey) || []);
+    state.anchors = [];
+    saved.forEach(item => {
+      const range = rangeFromOffsets(state.content, item.start, item.end);
+      if (!range || normalizeAnchorText(range.toString()) !== item.text) return;
+      try {
+        const mark = wrapAnchorRange(range, item.id);
+        state.anchors.push({ ...item, mark });
+      } catch { /* stale page content: skip this anchor */ }
+    });
     renderAnchors();
   }
 
@@ -232,45 +323,104 @@
       if (sel.rangeCount === 0 || sel.isCollapsed) continue;
       const range = sel.getRangeAt(0);
       if (range.commonAncestorContainer?.getRootNode?.() !== state.shadow) continue;
-      const text = sel.toString().trim().replace(/\s+/g, ' ');
+      const text = normalizeAnchorText(sel.toString());
       if (text) return { sel, range, text };
     }
     return null;
   }
 
   function addAnchorFromSelection() {
-    if (state.anchors.length >= 3) return;
+    if (state.anchors.length >= 3) { flashHint('3 anchors max'); return; }
     const picked = lensSelection();
     if (!picked) return;
     const words = picked.text.split(/\s+/).filter(Boolean);
     if (words.length > 5) { flashHint('Anchor: max 5 words'); return; }
     const startEl = picked.range.startContainer.nodeType === 1 ? picked.range.startContainer : picked.range.startContainer.parentElement;
     const endEl = picked.range.endContainer.nodeType === 1 ? picked.range.endContainer : picked.range.endContainer.parentElement;
+    if (startEl?.closest('.anchor-mark') || endEl?.closest('.anchor-mark') || picked.range.cloneContents().querySelector?.('.anchor-mark')) {
+      flashHint('Choose a new phrase');
+      return;
+    }
     const blockSelector = 'p,li,blockquote,pre,dd,dt,figcaption,td,th,h1,h2,h3,h4,h5,h6,div';
     if (startEl?.closest(blockSelector) !== endEl?.closest(blockSelector)) { flashHint('Anchor: one text block'); return; }
+    const start = boundaryTextOffset(state.content, picked.range.startContainer, picked.range.startOffset);
+    const end = boundaryTextOffset(state.content, picked.range.endContainer, picked.range.endOffset);
     const id = 'a' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-    const mark = document.createElement('span');
-    mark.className = 'anchor-mark';
-    mark.dataset.anchorId = id;
     try {
-      mark.append(picked.range.extractContents());
-      picked.range.insertNode(mark);
-    } catch { flashHint('Try a shorter phrase'); return; }
-    picked.sel.removeAllRanges();
-    state.anchors.push({ id, text: picked.text, mark });
-    renderAnchors();
-    flashHint(`Anchor ${state.anchors.length}/3`);
+      const mark = wrapAnchorRange(picked.range, id);
+      picked.sel.removeAllRanges();
+      state.anchors.push({ id, text: picked.text, mark, start, end });
+      persistAnchors();
+      renderAnchors();
+      flashHint(`Anchor ${state.anchors.length}/3`);
+    } catch { flashHint('Try a shorter phrase'); }
   }
 
   function removeAnchor(id) {
     const index = state.anchors.findIndex(anchor => anchor.id === id);
     if (index < 0) return;
-    const anchor = state.anchors[index];
-    const mark = anchor.mark;
+    const mark = state.anchors[index].mark;
+    const parent = mark?.parentNode;
     if (mark?.isConnected) mark.replaceWith(...mark.childNodes);
+    parent?.normalize?.();
     state.anchors.splice(index, 1);
+    persistAnchors();
     renderAnchors();
     flashHint('Anchor removed');
+  }
+
+  function setAnchorPeek(index, on) {
+    const anchor = state.anchors[index];
+    const slot = state.anchorStrip?.querySelector(`[data-anchor-slot="${index}"]`);
+    slot?.classList.toggle('is-peeking', !!on && !!anchor);
+    anchor?.mark?.classList.toggle('is-peeking', !!on);
+  }
+
+  function jumpToAnchor(index) {
+    const anchor = state.anchors[index];
+    const mark = anchor?.mark;
+    if (!mark?.isConnected) return;
+    mark.scrollIntoView({ behavior:'smooth', block:'center', inline:'nearest' });
+    mark.classList.remove('is-pulsing');
+    void mark.offsetWidth;
+    mark.classList.add('is-pulsing');
+    setTimeout(() => mark.classList.remove('is-pulsing'), 900);
+  }
+
+  function clearAnchorContext() {
+    clearTimeout(state.anchorContextTimer);
+    state.anchorContextTimer = null;
+    state.content?.querySelectorAll('.anchor-context-reveal').forEach(el => el.classList.remove('anchor-context-reveal'));
+  }
+
+  function revealAnchorContext(id) {
+    const anchor = state.anchors.find(item => item.id === id);
+    if (!anchor?.mark?.isConnected) return;
+    clearAnchorContext();
+    const block = anchor.mark.closest('p,li,blockquote,pre,dd,dt,figcaption,td,th,h1,h2,h3,h4,h5,h6,div');
+    if (!block) return;
+    block.classList.add('anchor-context-reveal');
+    const index = state.anchors.indexOf(anchor);
+    jumpToAnchor(index);
+    state.anchorContextTimer = setTimeout(() => block.classList.remove('anchor-context-reveal'), 2400);
+  }
+
+  function clearAnchorReturn() {
+    clearTimeout(state.anchorReturnTimer);
+    state.anchorReturnTimer = null;
+    state.content?.classList.remove('anchor-return');
+    state.content?.querySelectorAll('.anchor-neighborhood').forEach(el => el.classList.remove('anchor-neighborhood'));
+  }
+
+  function beginAnchorReturn() {
+    if (!state.content || !state.anchors.length) return;
+    clearAnchorReturn();
+    state.content.classList.add('anchor-return');
+    state.anchors.forEach(anchor => {
+      const block = anchor.mark?.closest('p,li,blockquote,pre,dd,dt,figcaption,td,th,h1,h2,h3,h4,h5,h6,div');
+      block?.classList.add('anchor-neighborhood');
+    });
+    state.anchorReturnTimer = setTimeout(clearAnchorReturn, 460);
   }
 
   function flashAnchors() {
@@ -297,8 +447,21 @@
     setTimeout(() => state.anchorFlashLayer?.replaceChildren(), 3400);
   }
 
+  function updateFocusButton() {
+    const button = state.toolbar?.querySelector('[data-act="focus"]');
+    if (!button) return;
+    const labels = { 0:'Focus', 1:'Focus', 2:'Deep', 3:'Anchors' };
+    button.textContent = labels[state.focusMode] || 'Focus';
+    const next = state.focusMode === 1 ? 'Deep' : state.focusMode === 2 ? (state.anchors.length ? 'Anchors' : 'Focus') : 'Focus';
+    button.title = `Current: ${labels[state.focusMode] || 'Focus'} · next: ${next}`;
+  }
+
   function applyFocusMode(mode) {
+    const previous = state.focusMode;
+    clearAnchorContext();
+    clearAnchorReturn();
     state.focusMode = mode;
+    state.content?.classList.toggle('anchor-only', mode === 3);
     if (mode === 0) {
       state.backdrop.style.background = 'rgba(12,16,22,0)';
       state.backdrop.style.pointerEvents = 'none';
@@ -309,6 +472,8 @@
       state.backdrop.style.background = `rgba(12,16,22,${state.config.isolateOpacity})`;
       state.backdrop.style.pointerEvents = 'auto';
     }
+    if (previous === 3 && mode === 1 && state.anchors.length) beginAnchorReturn();
+    updateFocusButton();
   }
 
   function cleanClone(node) {
@@ -417,6 +582,8 @@
     state.content.append(cleanClone(el));
     state.lastSelectionText = '';
     state.target = el;
+    state.anchorKey = el;
+    restoreAnchors();
   }
 
   function renderFromSelection(sel) {
@@ -429,6 +596,8 @@
     state.target = sel.range.commonAncestorContainer.nodeType === 1
       ? sel.range.commonAncestorContainer
       : sel.range.commonAncestorContainer.parentElement;
+    state.anchorKey = `selection:${location.href}:${normalizeAnchorText(sel.text)}`;
+    restoreAnchors();
   }
 
   function openFor(target, lock = false) {
@@ -464,7 +633,10 @@
   function close() {
     clearTimeout(state.hoverTimer);
     clearTimeout(state.leaveTimer);
+    persistAnchors();
     flashAnchors();
+    clearAnchorContext();
+    clearAnchorReturn();
     state.locked = false;
     state.target = null;
     state.hoverTarget = null;
@@ -474,6 +646,7 @@
     if (state.lens) state.lens.style.display = 'none';
     if (state.shelfPanel) state.shelfPanel.style.display = 'none';
     resetAnchors();
+    state.anchorKey = null;
   }
 
   function setZoom(index) {
@@ -486,8 +659,12 @@
   }
 
   function cycleFocus() {
-    applyFocusMode((state.focusMode + 1) % 3);
+    if (state.focusMode === 1) applyFocusMode(2);
+    else if (state.focusMode === 2) applyFocusMode(state.anchors.length ? 3 : 1);
+    else if (state.focusMode === 3) applyFocusMode(1);
+    else applyFocusMode(1);
   }
+
 
   function shelfText() {
     return (state.lastSelectionText || state.target?.textContent?.trim() || state.content?.textContent?.trim() || '').trim();
@@ -713,7 +890,7 @@
   }
 
   window.Viewoupe = {
-    version: '0.1.0',
+    version: '0.2.0',
     init,
     destroy,
     open(element) { if (element) openFor(element, true); },
