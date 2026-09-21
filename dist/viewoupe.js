@@ -9,6 +9,7 @@
     hoverDelay: 180,
     leaveDelay: 850,
     scrollCooldown: 500,
+    autoDim: true,
     dimOpacity: 0.72,
     isolateOpacity: 0.94,
   };
@@ -26,6 +27,9 @@
     shelfPanel: null,
     shelfList: null,
     shelf: [],
+    anchors: [],
+    anchorStrip: null,
+    anchorFlashLayer: null,
     target: null,
     hoverTarget: null,
     locked: false,
@@ -84,6 +88,15 @@
       .shelf-text { white-space:pre-wrap; overflow-wrap:anywhere; max-height:5.4em; overflow:hidden; font:500 13px/1.45 system-ui,-apple-system,Segoe UI,Arial,sans-serif; }
       .shelf-meta { margin-top:6px; opacity:.52; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font:500 11px system-ui,-apple-system,Segoe UI,Arial,sans-serif; }
       .shelf-remove { position:absolute; right:7px; top:7px; min-width:27px; padding:4px 7px; }
+      .anchor-strip { display:flex; gap:8px; align-items:center; padding:8px 14px; background:#f7f9fc; border-bottom:1px solid rgba(0,0,0,.08); }
+      .anchor-slot { flex:1; min-width:0; padding:7px 10px; border:1px dashed rgba(73,96,128,.28); border-radius:999px; color:#6b7480; background:#fff; font:600 12px system-ui,-apple-system,Segoe UI,Arial,sans-serif; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center; }
+      .anchor-slot.has-anchor { border-style:solid; border-color:rgba(64,116,214,.34); color:#20385f; background:linear-gradient(180deg,#fff 0%,#eef4ff 100%); box-shadow:0 0 0 1px rgba(76,124,214,.04),0 4px 14px rgba(45,83,150,.08); }
+      .anchor-mark { border-radius:.28em; padding:0 .08em; background:linear-gradient(180deg,rgba(255,244,171,.42),rgba(255,225,98,.62)); box-shadow:inset 0 -0.08em 0 rgba(210,161,0,.18); cursor:pointer; transition:box-shadow .16s ease,background .16s ease; }
+      .anchor-mark:hover { background:linear-gradient(180deg,rgba(255,244,171,.58),rgba(255,220,70,.78)); box-shadow:0 0 0 2px rgba(241,196,15,.12),0 0 16px rgba(255,209,45,.18); }
+      .anchor-flash-layer { position:fixed; inset:0; pointer-events:none; z-index:8; }
+      .anchor-ghost { position:fixed; margin:0; padding:0 .08em; color:#19263a; background:rgba(255,225,98,.78); border-radius:.28em; box-shadow:0 0 18px rgba(255,215,64,.76),0 0 42px rgba(255,215,64,.34); opacity:1; transform:scale(1); transform-origin:left center; animation:viewoupeAnchorFade 3.2s ease-out forwards; }
+      @keyframes viewoupeAnchorFade { 0% { opacity:1; filter:brightness(1.08); } 32% { opacity:1; filter:brightness(1.12); box-shadow:0 0 26px rgba(255,215,64,.92),0 0 62px rgba(255,215,64,.44); } 55% { opacity:.92; } 100% { opacity:0; filter:brightness(1); transform:scale(1.012); } }
+    
     `;
     state.shadow.append(style);
 
@@ -133,6 +146,11 @@
         </span>
         <span class="hint">Esc = close · Alt+L = toggle</span>
       </div>
+      <div class="anchor-strip" aria-label="Memory anchors">
+        <div class="anchor-slot" data-anchor-slot="0">Anchor 1</div>
+        <div class="anchor-slot" data-anchor-slot="1">Anchor 2</div>
+        <div class="anchor-slot" data-anchor-slot="2">Anchor 3</div>
+      </div>
       <div class="shelf-panel">
         <div class="shelf-head">
           <span><span class="shelf-title">Reading Shelf</span><div class="shelf-subtitle">Saved text clips from this page · temporary until reload</div></span>
@@ -149,9 +167,16 @@
     state.content = lens.querySelector('.content');
     state.toolbar = lens.querySelector('.toolbar');
     state.articleButton = lens.querySelector('[data-act="article"]');
+    state.anchorStrip = lens.querySelector('.anchor-strip');
     state.shelfPanel = lens.querySelector('.shelf-panel');
     state.shelfList = lens.querySelector('.shelf-list');
     state.shadow.append(lens);
+
+    const anchorFlashLayer = document.createElement('div');
+    anchorFlashLayer.className = 'anchor-flash-layer';
+    state.anchorFlashLayer = anchorFlashLayer;
+    state.shadow.append(anchorFlashLayer);
+    renderAnchors();
     renderShelf();
 
     state.shelfList.addEventListener('click', (event) => {
@@ -159,6 +184,12 @@
       if (!remove) return;
       state.shelf = state.shelf.filter(item => item.id !== remove.dataset.shelfRemove);
       renderShelf();
+    });
+
+    state.content.addEventListener('mouseup', () => setTimeout(addAnchorFromSelection, 0));
+    state.content.addEventListener('click', (event) => {
+      const mark = event.target.closest('.anchor-mark');
+      if (mark) removeAnchor(mark.dataset.anchorId);
     });
 
     lens.addEventListener('click', (event) => {
@@ -177,6 +208,107 @@
       if (action === 'shelf-hide') hideShelf();
       if (action === 'close') close();
     });
+  }
+
+  function renderAnchors() {
+    if (!state.anchorStrip) return;
+    const slots = [...state.anchorStrip.querySelectorAll('.anchor-slot')];
+    slots.forEach((slot, index) => {
+      const anchor = state.anchors[index];
+      slot.textContent = anchor ? anchor.text : `Anchor ${index + 1}`;
+      slot.title = anchor?.text || 'Select up to 5 words in the focused text';
+      slot.classList.toggle('has-anchor', !!anchor);
+    });
+  }
+
+  function resetAnchors() {
+    state.anchors = [];
+    renderAnchors();
+  }
+
+  function lensSelection() {
+    const candidates = [state.shadow?.getSelection?.(), document.getSelection?.(), window.getSelection?.()].filter(Boolean);
+    for (const sel of candidates) {
+      if (sel.rangeCount === 0 || sel.isCollapsed) continue;
+      const range = sel.getRangeAt(0);
+      if (range.commonAncestorContainer?.getRootNode?.() !== state.shadow) continue;
+      const text = sel.toString().trim().replace(/\s+/g, ' ');
+      if (text) return { sel, range, text };
+    }
+    return null;
+  }
+
+  function addAnchorFromSelection() {
+    if (state.anchors.length >= 3) return;
+    const picked = lensSelection();
+    if (!picked) return;
+    const words = picked.text.split(/\s+/).filter(Boolean);
+    if (words.length > 5) { flashHint('Anchor: max 5 words'); return; }
+    const startEl = picked.range.startContainer.nodeType === 1 ? picked.range.startContainer : picked.range.startContainer.parentElement;
+    const endEl = picked.range.endContainer.nodeType === 1 ? picked.range.endContainer : picked.range.endContainer.parentElement;
+    const blockSelector = 'p,li,blockquote,pre,dd,dt,figcaption,td,th,h1,h2,h3,h4,h5,h6,div';
+    if (startEl?.closest(blockSelector) !== endEl?.closest(blockSelector)) { flashHint('Anchor: one text block'); return; }
+    const id = 'a' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    const mark = document.createElement('span');
+    mark.className = 'anchor-mark';
+    mark.dataset.anchorId = id;
+    try {
+      mark.append(picked.range.extractContents());
+      picked.range.insertNode(mark);
+    } catch { flashHint('Try a shorter phrase'); return; }
+    picked.sel.removeAllRanges();
+    state.anchors.push({ id, text: picked.text, mark });
+    renderAnchors();
+    flashHint(`Anchor ${state.anchors.length}/3`);
+  }
+
+  function removeAnchor(id) {
+    const index = state.anchors.findIndex(anchor => anchor.id === id);
+    if (index < 0) return;
+    const anchor = state.anchors[index];
+    const mark = anchor.mark;
+    if (mark?.isConnected) mark.replaceWith(...mark.childNodes);
+    state.anchors.splice(index, 1);
+    renderAnchors();
+    flashHint('Anchor removed');
+  }
+
+  function flashAnchors() {
+    if (!state.anchorFlashLayer || !state.anchors.length) return;
+    state.anchorFlashLayer.replaceChildren();
+    state.anchors.forEach(anchor => {
+      const mark = anchor.mark;
+      if (!mark?.isConnected) return;
+      const cs = getComputedStyle(mark);
+      [...mark.getClientRects()].forEach(rect => {
+        if (rect.width <= 0 || rect.height <= 0) return;
+        const ghost = document.createElement('span');
+        ghost.className = 'anchor-ghost';
+        ghost.textContent = anchor.text;
+        Object.assign(ghost.style, {
+          left: rect.left + 'px', top: rect.top + 'px',
+          width: rect.width + 'px', minHeight: rect.height + 'px',
+          font: cs.font, lineHeight: cs.lineHeight,
+          overflow: 'hidden', whiteSpace: 'nowrap'
+        });
+        state.anchorFlashLayer.append(ghost);
+      });
+    });
+    setTimeout(() => state.anchorFlashLayer?.replaceChildren(), 3400);
+  }
+
+  function applyFocusMode(mode) {
+    state.focusMode = mode;
+    if (mode === 0) {
+      state.backdrop.style.background = 'rgba(12,16,22,0)';
+      state.backdrop.style.pointerEvents = 'none';
+    } else if (mode === 1) {
+      state.backdrop.style.background = `rgba(12,16,22,${state.config.dimOpacity})`;
+      state.backdrop.style.pointerEvents = 'auto';
+    } else {
+      state.backdrop.style.background = `rgba(12,16,22,${state.config.isolateOpacity})`;
+      state.backdrop.style.pointerEvents = 'auto';
+    }
   }
 
   function cleanClone(node) {
@@ -280,6 +412,7 @@
   }
 
   function renderFromElement(el) {
+    resetAnchors();
     state.content.innerHTML = '';
     state.content.append(cleanClone(el));
     state.lastSelectionText = '';
@@ -287,6 +420,7 @@
   }
 
   function renderFromSelection(sel) {
+    resetAnchors();
     state.content.innerHTML = '';
     const wrapper = document.createElement('div');
     wrapper.textContent = sel.text;
@@ -309,6 +443,7 @@
 
     state.locked = lock;
     state.lens.style.display = 'block';
+    applyFocusMode(state.config.autoDim ? 1 : 0);
     setZoom(state.zoomIndex);
     state.host.style.pointerEvents = 'none';
     state.lens.style.pointerEvents = 'auto';
@@ -320,6 +455,7 @@
     renderFromElement(root);
     state.locked = true;
     state.lens.style.display = 'block';
+    applyFocusMode(state.config.autoDim ? 1 : 0);
     setZoom(state.zoomIndex);
     state.content.scrollTop = 0;
     flashHint('Article mode');
@@ -328,18 +464,16 @@
   function close() {
     clearTimeout(state.hoverTimer);
     clearTimeout(state.leaveTimer);
+    flashAnchors();
     state.locked = false;
     state.target = null;
     state.hoverTarget = null;
     state.lastSelectionText = '';
     hideActivator();
-    state.focusMode = 0;
+    applyFocusMode(0);
     if (state.lens) state.lens.style.display = 'none';
     if (state.shelfPanel) state.shelfPanel.style.display = 'none';
-    if (state.backdrop) {
-      state.backdrop.style.background = 'rgba(12,16,22,0)';
-      state.backdrop.style.pointerEvents = 'none';
-    }
+    resetAnchors();
   }
 
   function setZoom(index) {
@@ -352,17 +486,7 @@
   }
 
   function cycleFocus() {
-    state.focusMode = (state.focusMode + 1) % 3;
-    if (state.focusMode === 0) {
-      state.backdrop.style.background = 'rgba(12,16,22,0)';
-      state.backdrop.style.pointerEvents = 'none';
-    } else if (state.focusMode === 1) {
-      state.backdrop.style.background = `rgba(12,16,22,${state.config.dimOpacity})`;
-      state.backdrop.style.pointerEvents = 'auto';
-    } else {
-      state.backdrop.style.background = `rgba(12,16,22,${state.config.isolateOpacity})`;
-      state.backdrop.style.pointerEvents = 'auto';
-    }
+    applyFocusMode((state.focusMode + 1) % 3);
   }
 
   function shelfText() {
