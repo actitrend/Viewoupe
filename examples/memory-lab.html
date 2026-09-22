@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="../assets/brand/favicon.svg" type="image/svg+xml">
+  <title>Viewoupe Memory Lab — Read. Reduce. Recall.</title>
+  <style>
+    *{box-sizing:border-box}html{background:#ece9e1;color:#171717}
+    body{margin:0;font:18px/1.72 Georgia,"Times New Roman",serif}
+    main{max-width:940px;margin:auto;background:#fff;min-height:100vh;padding:64px 72px 120px}
+    h1,h2{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;line-height:1.12;color:#111}
+    h1{font-size:52px;letter-spacing:-.045em;margin:.2em 0}.lead{font-size:23px;line-height:1.5;color:#4b4b4b}
+    .eyebrow,.meta{font:700 12px/1.4 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-transform:uppercase;letter-spacing:.12em;color:#707781}
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:32px 0 54px}
+    .step{border:1px solid #ded9cf;border-radius:14px;padding:17px;background:#faf8f3;font:14px/1.5 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    .step strong{display:block;font-size:16px;color:#20242a;margin-bottom:4px}.case{padding:42px 0;border-top:1px solid #e5e0d7}
+    .passage{font-size:25px;line-height:1.62}.tip{padding:14px 16px;border-left:4px solid #d7bc3c;background:#fffbea;font:14px/1.5 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#525252}
+    .test{margin-top:48px;padding:20px 22px;border-radius:14px;background:#eef4ff;font:14px/1.55 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#fff;padding:.12em .3em;border-radius:4px}
+    @media(max-width:760px){main{padding:44px 24px 90px}.steps{grid-template-columns:1fr}h1{font-size:40px}.passage{font-size:21px}}
+  </style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">Viewoupe Memory prototype</div>
+  <h1>Read. Reduce. Recall.</h1>
+  <p class="lead">This page tests the first local-first memory cycle: read a passage, reduce it to up to three anchors, add one optional “In my words” thought, then recall before revealing the original.</p>
+
+  <div class="steps">
+    <div class="step"><strong>Read</strong>Open a paragraph with VL and use Focus/Deep to isolate the thought.</div>
+    <div class="step"><strong>Reduce</strong>Select up to three short anchors. Then add one optional sentence in “In my words”.</div>
+    <div class="step"><strong>Recall</strong>Press Recall. Use only the anchors first; reveal your thought and the original afterwards.</div>
+  </div>
+
+  <section class="case">
+    <div class="meta">Charles Darwin · On the Origin of Species · 1859</div>
+    <h2>Causal argument</h2>
+    <p class="passage">As many more individuals of each species are born than can possibly survive, and as, consequently, there is a frequently recurring struggle for existence, it follows that any being, if it vary however slightly in any manner profitable to itself, under the complex and sometimes varying conditions of life, will have a better chance of surviving, and thus be naturally selected.</p>
+    <p class="tip">Try anchors such as “more individuals are born”, “struggle for existence”, and “better chance of surviving”. Then write the causal idea in one sentence of your own.</p>
+  </section>
+
+  <section class="case">
+    <div class="meta">Jane Austen · Pride and Prejudice · 1813</div>
+    <h2>Subtext</h2>
+    <p class="passage">It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.</p>
+    <p class="tip">Reduce the sentence to cues that help you recover the social assumption and its exaggerated certainty, not merely the literal wording.</p>
+  </section>
+
+  <section class="case">
+    <div class="meta">Лев Толстой · Анна Каренина · 1878</div>
+    <h2>Thesis</h2>
+    <p class="passage" lang="ru">Все счастливые семьи похожи друг на друга, каждая несчастливая семья несчастлива по-своему.</p>
+    <p class="tip">Сделайте anchors, затем сформулируйте тезис одной собственной фразой. После сохранения обновите страницу и снова откройте тот же абзац.</p>
+  </section>
+
+  <div class="test">
+    <strong>Persistence test.</strong> Create anchors and “In my words”, close Viewoupe, then reload this page. Reopen the same paragraph. The Memory module uses <code>localStorage</code> on this origin and attempts to restore the saved anchors into the reading layer. No account, server, or network request is used.
+  </div>
+
+  <script src="../dist/viewoupe.js" data-viewoupe></script>
+  <script src="../dist/viewoupe-memory.js"></script>
+</main>
+</body>
+</html>
