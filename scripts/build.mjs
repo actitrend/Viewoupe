@@ -4,10 +4,14 @@ import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
-const src = path.join(root, 'src', 'viewoupe.js');
 const distDir = path.join(root, 'dist');
-const dist = path.join(distDir, 'viewoupe.js');
+const files = ['viewoupe.js', 'viewoupe-memory.js'];
 
 fs.mkdirSync(distDir, { recursive: true });
-fs.copyFileSync(src, dist);
-console.log(`Built ${path.relative(root, dist)}`);
+for (const file of files) {
+  const src = path.join(root, 'src', file);
+  if (!fs.existsSync(src)) continue;
+  const dist = path.join(distDir, file);
+  fs.copyFileSync(src, dist);
+  console.log(`Built ${path.relative(root, dist)}`);
+}
